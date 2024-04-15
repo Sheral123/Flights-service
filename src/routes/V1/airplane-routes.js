@@ -19,5 +19,9 @@ router.get('/', AirplaneController.GetAllAirplane);
 // /api/V1/airplanes/:id GET
 router.get('/:id', AirplaneController.GetAirplane);
 
+// /api/V1/airplanes/:id DELETE
+router.delete('/:id', AirplaneController.DestroyAirplane);
+
                 
+
 module.exports = router;

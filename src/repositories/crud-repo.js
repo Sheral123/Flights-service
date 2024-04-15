@@ -20,6 +20,11 @@ class CrudRepo {
                 id: data
             }
         })
+        //console.log(!response);
+        if(!response){
+            throw new AppError('Not able to find data to delete', StatusCodes.NOT_FOUND)
+        }
+
         return response
         
         

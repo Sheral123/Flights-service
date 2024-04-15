@@ -9,13 +9,17 @@
   "author": "Sheral",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.20.2",
+    "cli": "^1.0.1",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "flatted": "^3.3.1",
     "http-status-codes": "^2.3.0",
     "mysql2": "^3.9.3",
     "nodemon": "^3.1.0",
     "sequelize": "^6.37.2",
     "sequelize-cli": "^6.6.2",
+    "stringify": "^5.2.0",
     "winston": "^3.13.0"
   }
 }

@@ -1,7 +1,8 @@
 const { StatusCodes } = require('http-status-codes');
 const{FlightRepo } = require('../repositories');
 const AppError = require('../utills/errors/app-error');
-const{ datetimeHelpers } = require('../utills/helpers/datetime-helper')
+const datetimeHelpers  = require('../utills/helpers/datetime-helper');
+const{Op} = require('sequelize');
 
 const flightRepo = new FlightRepo();
 
@@ -16,6 +17,7 @@ async function createFlight(data){
         const flight = await flightRepo.create(data);
         return flight;
     } catch (error) {
+        console.log(error);
         if(error.name == 'SequelizeValidationError'){
             let explanation = [];
             error.errors.forEach((err) => {
@@ -29,44 +31,54 @@ async function createFlight(data){
 }
 
 
-async function getFlights(){
-    try {
-        const flight = await flightRepo.getAll();
-        return flight;
-    } catch (error) {
-        throw new AppError('Unable to fetch data from mysql database', StatusCodes.INTERNAL_SERVER_ERROR);
+async function getAllFlights(query){
+    let customFilter = {};
+    let sortFilter = [];
+    const endingTime = "23:59:00";
+    //trips=MUM-DEL
+    if(query.trips){
+        [departureairportId, arrivalairportId] = query.trips.split('-');
+        customFilter.departureairportId=departureairportId;
+        customFilter.arrivalairportId=arrivalairportId;
     }
-}
 
-async function getFlight(id){
-    try {
-        const flight = await flightRepo.get(id);
-        return flight;
-    } catch (error) {
-        if(error.statusCode == StatusCodes.NOT_FOUND){
-            throw new AppError('The flight data you requested is not present', error.statusCode);
+    if(query.price){
+        [minPrice, maxPrice] = query.price.split('-');
+        customFilter.price = {
+            [Op.between]: [minPrice,(maxPrice == undefined) ? 20000 : maxPrice]
         }
-        throw new AppError('Unable to fetch data from mysql database', StatusCodes.INTERNAL_SERVER_ERROR);
     }
-}
 
-async function destroyFlight(id){
-    try {
-        const response = await flightRepo.destroy(id);
-        return response;
-    } catch (error) {
-        if(error.statusCode == StatusCodes.NOT_FOUND){
-            throw new AppError('The flight data you requested to delete is not present', error.statusCode);
+    if(query.travellers){
+        customFilter.totalSeats = {
+            [Op.gte]: query.travellers
         }
-
-        throw new AppError('Unable to delete data from mysql database', StatusCodes.INTERNAL_SERVER_ERROR);
     }
-}
 
+    if(query.tripDate){
+        customFilter.departureTime = {
+            
+            [Op.between]: [query.tripDate + "00:00:00",query.tripDate + endingTime ]
+        }
+    }
+
+    if(query.sort){
+        const params = query.sort.split(',');
+        const sortFilters= params.map((p) => p.split('_'));
+        sortFilter = sortFilters
+    }
+
+    try {
+        const flights = await flightRepo.getAllFlights(customFilter,sortFilter);
+        return flights;
+    } catch (error) {
+        console.log(error);
+        throw new AppError('Cannot fetch data of all the flights', StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+
+}
 
 module.exports = {
     createFlight,
-    getFlight,
-    getFlights,
-    destroyFlight
+    getAllFlights
 }                                         

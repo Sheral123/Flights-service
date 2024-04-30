@@ -11,6 +11,9 @@ router.post('/',
                 FlightMiddlewares.validateCreateRequest,
                 FlightController.CreateFlight);
 
+// /api/V1/flights?MUM-DEL GET
+router.get('/',FlightController.getAllFlights);
+
                 
 
 module.exports = router;

@@ -40,7 +40,7 @@ async function CreateFlight(req, res){
                 .status(StatusCodes.CREATED)
                 .json(SuccessResponse)
     } catch (error) {
-        //console.log('Sheral', error);
+        console.log('Sheral', error);
         ErrorResponse.error = error;
         return res  
                 .status(error.statusCode)
@@ -54,9 +54,9 @@ async function CreateFlight(req, res){
 // req-body {}
 
 
-async function GetAllFlight(req, res){
+async function getAllFlights(req, res){
     try {
-        const flights = await FlightService.getFlights();
+        const flights = await FlightService.getAllFlights(req.query);
         SuccessResponse.data = flights;
         return res
                 .status(StatusCodes.OK)
@@ -69,51 +69,7 @@ async function GetAllFlight(req, res){
     }
 }
 
-
-//GET : /airports/:id
-// req-body {}
-
-
-async function GetFlight(req, res){
-    try {
-        const flight = await FlightService.getFlight(req.params.id);
-        SuccessResponse.data = flight;
-        return res
-                .status(StatusCodes.OK)
-                .json(SuccessResponse)
-    } catch (error) {
-        ErrorResponse.error = error;
-        return res
-                .status(error.statusCode)
-                .json(ErrorResponse)
-    }
-}
-
-
-// : /airports/:id
-// req-body {}
-
-
-async function DestroyFlight(req, res){
-    try {
-        const response = await FlightService.destroyFlight(req.params.id);
-        SuccessResponse.data = response;
-        return res
-                .status(StatusCodes.OK)
-                .json(SuccessResponse)
-    } catch (error) {
-        ErrorResponse.error = error;
-        return res
-                .status(error.statusCode)
-                .json(ErrorResponse)
-    }
-}
-
-
-
 module.exports = {
     CreateFlight,
-    GetAllFlight,
-    GetFlight,
-    DestroyFlight
+    getAllFlights
 }

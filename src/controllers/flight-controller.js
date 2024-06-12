@@ -69,7 +69,30 @@ async function getAllFlights(req, res){
     }
 }
 
+//GET : /airplanes/:id
+// req-body {}
+
+
+async function getFlight(req, res){
+    try {
+        const flight = await FlightService.getFlight(req.params.id);
+        console.log('controller',flight);
+        SuccessResponse.data = flight;
+        return res
+                .status(StatusCodes.OK)
+                .json(SuccessResponse)
+    } catch (error) {
+        ErrorResponse.error = error;
+        return res
+                .status(error.statusCode)
+                .json(ErrorResponse)
+    }
+}
+
+
+
 module.exports = {
     CreateFlight,
-    getAllFlights
+    getAllFlights,
+    getFlight
 }

@@ -1,7 +1,7 @@
 const {Sequelize, Op} = require('sequelize')
 const CrudRepo = require('./crud-repo');
 
-const { Flight, Airplane, Airport } = require('../models')
+const { Flight, Airplane,City, Airport } = require('../models')
 class FlightRepo extends CrudRepo{
     constructor(){
         super(Flight);

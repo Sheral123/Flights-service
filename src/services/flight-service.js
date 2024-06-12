@@ -78,7 +78,24 @@ async function getAllFlights(query){
 
 }
 
+async function getFlight(id){
+    try {
+        const flight = await flightRepo.get(id);
+        console.log('service',flight);
+        return flight;
+    } catch (error) {
+        console.log('service',error);
+        if(error.statusCode == StatusCodes.NOT_FOUND){
+            throw new AppError('The flight data you requested is not present', error.statusCode);
+        }
+        throw new AppError('Unable to fetch data from mysql database', StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+}
+
+
+
 module.exports = {
     createFlight,
-    getAllFlights
+    getAllFlights,
+    getFlight
 }                                         

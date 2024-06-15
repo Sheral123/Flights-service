@@ -54,19 +54,26 @@ class FlightRepo extends CrudRepo{
     async updateRemainingSeats(flightId, seats, dec= true){
         //const flight= await Flight.findByPk(flightId);
         const transaction = await db.sequelize.transaction();
-        await db.sequelize.query(`Select * from Flights WHERE Flights.id = ${flightId} FOR UPDATE `);
-        if(+(dec)){
-            await Flight.decrement('totalSeats', {by: seats, where:{id: flightId}}, {transaction: transaction});
+        try {
+            await db.sequelize.query(`Select * from Flights WHERE Flights.id = ${flightId} FOR UPDATE `);
+            if(+(dec)){
+                await Flight.decrement('totalSeats', {by: seats, where:{id: flightId}}, {transaction: transaction});
+            }
+            else{
+                await Flight.increment('totalSeats', {by: seats, where:{id: flightId}}, {transaction: transaction});
+            }
+            const flight= await Flight.findByPk(flightId);
+            await transaction.commit();
+            return flight;
+            
+        } catch (error) {
+            await transaction.rollback();
+            throw error;
         }
-        else{
-            await Flight.increment('totalSeats', {by: seats, where:{id: flightId}}, {transaction: transaction});
-        }
-        const flight= await Flight.findByPk(flightId);
-        return flight;
-    }
+        
     
+    }
 }
-
 
 
  
